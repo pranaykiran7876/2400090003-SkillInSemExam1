@@ -1,0 +1,63 @@
+import React, { useState } from 'react';
+import './Calendar.css'; 
+
+const events = [
+  { date: '2025-10-16', title: 'React Workshop', description: 'Intro to hooks and state.' },
+  { date: '2025-10-20', title: 'Team Meeting', description: 'Discuss Q4 goals.' },
+  { date: '2025-10-25', title: 'Hackathon', description: 'Build something cool!' },
+];
+const Calendar = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth(); 
+  const [selectedDate, setSelectedDate] = useState(null);
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay(); 
+  const handleDateClick = (day) => {
+    const clickedDate = new Date(year, month, day).toISOString().split('T')[0];
+    setSelectedDate(clickedDate);
+  };
+  const renderCalendar = () => {
+    const calendar = [];
+    for (let i = 0; i < firstDay; i++) {
+      calendar.push(<div key={`empty-${i}`} className="calendar-cell empty" />);
+    }
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = new Date(year, month, day).toISOString().split('T')[0];
+      const isSelected = selectedDate === dateStr;
+      calendar.push(
+        <div
+          key={day}
+          className={`calendar-cell ${isSelected ? 'selected' : ''}`}
+          onClick={() => handleDateClick(day)}
+        >
+          {day}
+        </div>
+      );
+    }
+    return calendar;
+  };
+  const selectedEvents = events.filter((event) => event.date === selectedDate);
+  return (
+    <div className="calendar-container">
+      <h2>{today.toLocaleString('default', { month: 'long' })} {year}</h2>
+      <div className="calendar-grid">{renderCalendar()}</div>
+      {selectedDate && (
+        <div className="event-details">
+          <h3>Events on {selectedDate}</h3>
+          {selectedEvents.length > 0 ? (
+            selectedEvents.map((event, index) => (
+              <div key={index} className="event-card">
+                <strong>{event.title}</strong>
+                <p>{event.description}</p>
+              </div>
+            ))
+          ) : (
+            <p>No events for this date.</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+export default Calendar;
